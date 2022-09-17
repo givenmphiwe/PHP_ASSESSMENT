@@ -7,7 +7,7 @@ if (file_exists("notes.txt")){
     $file = "notes.txt";
     $current = file_get_contents($file);
 } else {
-    $myfile = fopen("log.txt", "w");
+    $myfile = fopen("notes.txt", "w");
     header("Refresh:0");
 }
 ?>
