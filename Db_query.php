@@ -19,17 +19,19 @@ $conn = new mysqli($hostName,$authName,$pass,$dbname);
 switch ($_POST['action']) {
     case 'registration':
         $fname =$_POST['fname'];
-        $fname = encrypt_this($fname, $key);
         $email = $_POST['email'];
         $phone_number = $_POST['phone_number'];
         $phone_number = encrypt_this($phone_number, $key);
         $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-        $sql="INSERT INTO people(fname,email,phone_number,password) VALUES('$fname','$email','$phone_number','$password')";
+        $sql="INSERT INTO users(fname,email,phone_number,password) VALUES('$fname','$email','$phone_number','$password')";
         $run_qry = mysqli_query($conn,$sql);
         if($run_qry){
             session_start();
             header("location:welcome.php");
+        }
+        else{
+            header("location:Sign-up.php");
         }
         break;
     //For the signing or log-in
@@ -37,7 +39,7 @@ switch ($_POST['action']) {
         $email = $_POST['email'];
         $password = $_POST['password'];
         
-        $select_user="SELECT * FROM people WHERE email='$email'";
+        $select_user="SELECT * FROM users WHERE email='$email'";
         $run_qry = mysqli_query($conn,$select_user);
 
         if (mysqli_num_rows($run_qry) > 0) {
@@ -50,7 +52,7 @@ switch ($_POST['action']) {
                     header("location:welcome.php");
                 }
                 else{
-                    header("location:Sign-in.php");
+                    header("location:Sign-up.php");
                 }
             }
         }

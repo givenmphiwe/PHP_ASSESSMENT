@@ -1,3 +1,5 @@
 body {
-    background-color: #FF6112;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(#4671EA, #AC34E7);
 }

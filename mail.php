@@ -1,58 +1,67 @@
 <?php
-//Import PHPMailer classes into the global namespace
-//These must be at the top of your script, not inside a function
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
+$hostName = 'localhost';
+$authName = 'root';
+$pass = '';
+$dbname = 'iclix';
 
-//Load Composer's autoloader
-require 'vendor/autoload.php';
+//The key for encrypte 
+$key = 'qyehcyUgendjeosjrhw095wjdina%^jdhruendhskdoejc';
 
-//get data from form
-
-$name = $_POST['name'];
-$email = $_POST['email'];
-$message = $_POST['message'];
-
-// preparing mail content
-$messagecontent ="Name = ". $name . "<br>Email = " . $email . "<br>Message =" . $message;
-
-
-//Create an instance; passing `true` enables exceptions
-$mail = new PHPMailer(true);
-
-try {
-    //Server settings
-    //$mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
-    $mail->isSMTP();                                            //Send using SMTP
-    $mail->Host       = 'smtp.mailtrap.io';                     //Set the SMTP server to send through
-    $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-    $mail->Username   = 'username_here';                     //SMTP username
-    $mail->Password   = 'password_here';                               //SMTP password
-   // $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
-    $mail->Port       = 2525;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
-
-    //Recipients
-    $mail->setFrom('from@example.com', 'Mailer');
-    $mail->addAddress('joe@example.net', 'Joe User');     //Add a recipient
-    $mail->addAddress('ellen@example.com');               //Name is optional
-    $mail->addReplyTo('info@example.com', 'Information');
-    $mail->addCC('cc@example.com');
-    $mail->addBCC('bcc@example.com');
-
-    //Attachments
-
-    //$mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
-   // $mail->addAttachment('photo.jpeg', 'photo.jpeg');    //Optional name
-
-    //Content
-    $mail->isHTML(true);                                  //Set email format to HTML
-    $mail->Subject = 'Here is the subject';
-    $mail->Body    = $messagecontent;
-    
-
-    $mail->send();
-    echo 'Message has been sent';
-} catch (Exception $e) {
-   // echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+//function to encrypt strings
+function encrypt_this($data,$key) {
+    $encryption_key = base64_decode($key);
+    $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+    $encrypted = openssl_encrypt($data,'aes-256-cbc',$encryption_key,0,$iv);
+    return base64_encode($encrypted . '::' .$iv);
 }
+/**
+ * notes data
+ * id
+ * notes
+ * name
+ */
+//Sending Everything in the database
+$conn = new mysqli($hostName,$authName,$pass,$dbname);
+switch ($_POST['action']) {
+    case 'message':
+        $notes =$_POST['notes'];
+        $email = $_POST['email'];
+        $names = $_POST['names'];
+
+        $sql="INSERT INTO messages(notes,email,names) VALUES('$notes','$email','$names')";
+        $run_qry = mysqli_query($conn,$sql);
+        if($run_qry){
+            header("location:welcome.php");
+        }
+        else{
+            echo "Error";
+        }
+        break;
+    default:
+    break;
+}
+
+/**
+ * Getting array of emails for users
+ */
+$sql = "SELECT * FROM messages";
+$run_qry = mysqli_query($conn,$sql);
+$email_list = array();
+if (mysqli_num_rows($run_qry) > 0){
+    while($row = mysqli_fetch_assoc($run_qry)){
+        $email_list[] = $row;
+    }
+}
+//print_r($email_list);
+foreach($email_list as $user_mails){
+    echo $user_mails['email'].", ";
+}
+?>
+
+<?php
+/**
+ * 
+ * 
+ */
+
+?>

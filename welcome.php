@@ -6,10 +6,6 @@ session_start();
 
 $conn = mysqli_connect("localhost","root","","iclix");
 
-$query="select * from messages";
-$connect=mysqli_query($conn,$query);
-//$data=mysqli_fetch_assoc($connect);
-$num=mysqli_num_rows($connect); //check in the database if its empty or not
 ?>
 
 <!DOCTYPE html>
@@ -22,6 +18,8 @@ $num=mysqli_num_rows($connect); //check in the database if its empty or not
         *{
             padding: 0;
             margin: 0;
+            align-items: center;
+            justify-content: center;
             box-sizing: border-box;
             font-family: "poppins", sans-serif;
         }
@@ -35,6 +33,8 @@ $num=mysqli_num_rows($connect); //check in the database if its empty or not
         .wrapper{
             width: 470px;
             background: #fff;
+            margin-left: 160px;
+            margin-bottom: 80px;
             border-radius: 5px;
             padding: 25px 25px 30px;
         }
@@ -62,10 +62,25 @@ $num=mysqli_num_rows($connect); //check in the database if its empty or not
         textarea::-webkit-scrollbar{
             width:0px;
         }
+        .button{
+            border-radius: 5px;
+            outline: none;
+            resize: none;
+            font-size: 16px;
+            border-color: #bfbfbf;
+            margin-top: 5px;
+            width: 120px;
+            height:30px;
+            color: #fff;
+            background: #AC34E7
+
+        }
         .cointaner{
             max-width: 900px;
             margin: 100px auto;
             width: 100%;
+            
+            
         }
         table{
             border-collapse: collapse;
@@ -88,18 +103,23 @@ $num=mysqli_num_rows($connect); //check in the database if its empty or not
     </style>
 </head>
 <body>
+<div>
+
     <div class="wrapper">
         <?php
-        $conn = mysqli_connect("localhost","root","","iclix");
-         $selec = "SELECT * FROM people";
+         $selec = "SELECT * FROM Users";
          $query= mysqli_query($conn,$selec);
-         $name = mysqli_fetch_assoc($query)       
+         $name = mysqli_fetch_assoc($query);
+             
         ?>
         <h2>Welcome <?php echo $name['fname']; ?></h2>
 
-        <form>
-            <textarea placeholder="Type something here..."></textarea>
-            <button>Save</button>
+        <form action="mail.php" method="POST">
+            <input type="hidden" name="action" value="message">
+            <input type="hidden" name="email" value="<?php echo $name['email']; ?>">
+            <input type="hidden" name="names" value="<?php echo $name['fname']; ?>">
+            <textarea name="notes"placeholder="Type something here..." required></textarea>
+            <input class="button" type ="submit"  name="submit"/><br>
         </form>
     </div>
 
@@ -111,22 +131,41 @@ $num=mysqli_num_rows($connect); //check in the database if its empty or not
                 <th>Date</th>
             </tr>
             <?php
-            if ($num>0){
-                while($data=mysqli_fetch_assoc($connect)){
+                    /**
+                    * The Key can be more secured. By saving the key in another database/server
+                    * Retrive it from there.
+                    *  
+                    */
+                $key = 'qyehcyUgendjeosjrhw095wjdina%^jdhruendhskdoejc';
+                
+                function decrypt_this($data, $key){
+                    $encryption_key = base64_decode($key);
+                    list($encrypted_data,$iv) = array_pad(explode(':',base64_decode($data),2),2,null);
+                    return openssl_decrypt($encrypted_data,'AES-256-CBC',$encryption_key,0,$iv);
+                }
+
+                $result = $conn->query("SELECT * FROM messages");
+
+                while($row = $result->fetch_assoc()){ 
+                    //I must dencryt               
+                    $notes = $row['notes'];
+                    $names = $row['names'];
+                    $reg_date=$row['reg_date'];
+
                 echo"    
                 <tr>        
-                <td>".$data['notes']."</td>
-                <td>".$data['email']."</td>
-                <td>".$data['reg_date']."</td>
+                <td>$notes</td>
+                <td>$names</td>
+                <td>$reg_date</td>
                 </tr>
                 ";
                 }
-            } 
+     
             ?>
             
         </table> 
     </div>
-    
+</div>
     <script>
         const textarea = document.querySelector("textarea");
         textarea.addEventListener("keyup", e =>{
