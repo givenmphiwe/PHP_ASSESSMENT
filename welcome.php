@@ -113,11 +113,12 @@ $conn = mysqli_connect("localhost","root","","iclix");
              
         ?>
         <h2>Welcome <?php echo $name['fname']; ?></h2>
-
+        
         <form action="mail.php" method="POST">
             <input type="hidden" name="action" value="message">
             <input type="hidden" name="email" value="<?php echo $name['email']; ?>">
             <input type="hidden" name="names" value="<?php echo $name['fname']; ?>">
+            <input type="hidden" name="email" value="notes Added" >
             <textarea name="notes"placeholder="Type something here..." required></textarea>
             <input class="button" type ="submit"  name="submit"/><br>
         </form>
