@@ -84,8 +84,7 @@ $mail->Subject = 'New Notes Created';
 
 $mail->msgHTML($body);
 
-//Connect to the database and select the recipients from mailing list 
-//You'll need to alter this to match your database
+//Connect to the database and select the recipients from email list 
 $mysql = mysqli_connect($hostName,$authName,$pass);
 mysqli_select_db($mysql,$dbname);
 $result = mysqli_query($mysql, 'SELECT names, email FROM messages');
@@ -108,8 +107,8 @@ foreach ($result as $row){
         //The loop will continue trying to send to the rest of the list
         $mail->getSMTPInstance()->reset();
     }
-    //Clear all addresses and attachments
+    //Clear all addresses 
     $mail->clearAddresses();
-    $mail->clearAttachments();
+    //$mail->clearAttachments();
 }
 ?>
