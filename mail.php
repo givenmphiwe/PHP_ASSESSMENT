@@ -4,21 +4,9 @@ $authName = 'root';
 $pass = '';
 $dbname = 'iclix';
 
-//The key for encrypte 
-$key = 'qyehcyUgendjeosjrhw095wjdina%^jdhruendhskdoejc';
 
-//function to encrypt strings
-function encrypt_this($data,$key) {
-    $encryption_key = base64_decode($key);
-    $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
-    $encrypted = openssl_encrypt($data,'aes-256-cbc',$encryption_key,0,$iv);
-    return base64_encode($encrypted . '::' .$iv);
-}
 /**
- * notes data
- * id
- * notes
- * name
+ * Pushing/saving the details to another db table
  */
 //Sending Everything in the database
 $conn = new mysqli($hostName,$authName,$pass,$dbname);
@@ -49,8 +37,9 @@ $authName = 'root';
 $pass = '';
 $dbname = 'iclix';
 /**
- * 
- * 
+ * I used mailtrap to test
+ * Everytime the user clicks submit in the welcome page
+ * email will be sent out to all users in db
  */
 //Import the PHPMailer class into the global namespace
 use PHPMailer\PHPMailer\PHPMailer;
@@ -66,7 +55,7 @@ require 'vendor/autoload.php';
 $mail = new PHPMailer(true);
 
 
-//alternatively I can create an html file for email body and use file_get
+//alternatively I can create an html file for email body and use file_get_contents
 $body = "The team has added a new note check it out";
 
 $mail->isSMTP();

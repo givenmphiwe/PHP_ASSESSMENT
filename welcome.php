@@ -1,18 +1,23 @@
 <?php
 session_start();
-/** 
- * 
-*/
+if(!$_SESSION['iclix'])
+{
+    header('location:Sign-In.php');
+}
 
+//connecting databse
 $conn = mysqli_connect("localhost","root","","iclix");
 
+//pop message
+$pop = "<script>alert('Welcome to notes writer');</script>";
+echo "$pop";
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
-    <title>WELCOME</title>
+    <title>DASHBOARD</title>
     <style type="text/css">
         @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
         *{
@@ -33,8 +38,9 @@ $conn = mysqli_connect("localhost","root","","iclix");
         .wrapper{
             width: 470px;
             background: #fff;
-            margin-left: 160px;
-            margin-bottom: 80px;
+            margin-top: 15px;
+            margin-left: 40px;
+            margin-bottom: 40px;
             border-radius: 5px;
             padding: 25px 25px 30px;
         }
@@ -54,12 +60,12 @@ $conn = mysqli_connect("localhost","root","","iclix");
             border-color: #bfbfbf;
             margin-top: 20px;
         }
-        textarea :is(:focus, :valid){
+        .textarea :is(:focus, :valid){
             border-width:2px;
             padding: 14px;
             border-color: #bfbfbf;
         }
-        textarea::-webkit-scrollbar{
+        .textarea::-webkit-scrollbar{
             width:0px;
         }
         .button{
@@ -74,6 +80,18 @@ $conn = mysqli_connect("localhost","root","","iclix");
             color: #fff;
             background: #AC34E7
 
+        }
+        .LogoutButton{
+            border-radius: 5px;
+            outline: none;
+            resize: none;
+            font-size: 16px;
+            border-color: #bfbfbf;
+            margin-top: 5px;
+            width: 120px;
+            height:30px;
+            color: #fff;
+            background: #AC34E7
         }
         .cointaner{
             max-width: 900px;
@@ -100,28 +118,34 @@ $conn = mysqli_connect("localhost","root","","iclix");
         table tr:nth-child(odd){
             background: #797676
         }
+        .link{
+            color: #fff;
+        }
     </style>
 </head>
-<body>
-<div>
 
+<body>
+
+<div>
+    <a class="link" href="logout.php">
+        <button class="LogoutButton">Logout</button>
+        <?php echo $_SESSION['email']; ?>
+    </a>
+    
     <div class="wrapper">
-        <?php
-         $selec = "SELECT * FROM Users";
-         $query= mysqli_query($conn,$selec);
-         $name = mysqli_fetch_assoc($query);
-             
-        ?>
-        <h2>Welcome <?php echo $name['fname']; ?></h2>
+        
+        <h2>Hey <?php echo $_SESSION['username']; ?></h2>
         
         <form action="mail.php" method="POST">
             <input type="hidden" name="action" value="message">
-            <input type="hidden" name="email" value="<?php echo $name['email']; ?>">
-            <input type="hidden" name="names" value="<?php echo $name['fname']; ?>">
+            <input type="hidden" name="email" value="<?php echo $_SESSION['email']; ?>">
+            <input type="hidden" name="names" value="<?php echo $_SESSION['username']; ?>"/>
             
-            <textarea name="notes"placeholder="Type something here..." required></textarea>
+            <textarea name="notes"placeholder="Type your notes here..." required></textarea>
             <input class="button" type ="submit"  name="submit"/><br>
         </form>
+
+        
     </div>
 
     <div class="container">
@@ -147,8 +171,7 @@ $conn = mysqli_connect("localhost","root","","iclix");
 
                 $result = $conn->query("SELECT * FROM messages");
 
-                while($row = $result->fetch_assoc()){ 
-                    //I must dencryt               
+                while($row = $result->fetch_assoc()){              
                     $notes = $row['notes'];
                     $names = $row['names'];
                     $reg_date=$row['reg_date'];
